@@ -54,15 +54,16 @@ This command maximizes the window to fill the current tab page, hiding all the w
 
 ### g
 
-This command switches focus to the selected window if it is visible in any of the tabs.
+This command switches focus to the selected window if it is visible in any of the tabs. This is different from the 'enter' command in the sense that it does not loads the contents of the buffer into the current window. If a buffer is being displayed in more than a window, then all those windows will be represented by the lines under the entry for that buffer.
+Executing the g command on those entries switches the user to the corresponding window and tab.
 
 ### d
 
-This command deletes the selected buffer from the buffer list.
+This command deletes the selected buffer from the buffer list. Buffer list window is not closed.
 
 ### x
 
-This command closes the selected window. It does not matter if the window is open in another tab. Buffer is not removed from the list.
+This command closes the selected window. It does not matter if the window is open in another tab. Buffer is not removed from the list. The buffer list window remains open.
 
 ### m
 
