@@ -63,7 +63,7 @@ This command deletes the selected buffer from the buffer list. Buffer list windo
 
 ### x
 
-This command closes the selected window. It does not matter if the window is open in another tab. Buffer is not removed from the list. The buffer list window remains open.
+This command closes the selected window. It does not matter if the window is open in another tab. Buffer is not removed from the list. The buffer list window remains open. With this you can use the buffer list window as a remote control to navigate to or close any window in any tab.
 
 ### m
 
