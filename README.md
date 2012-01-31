@@ -22,6 +22,7 @@ The plugin exports two command Bufferlist and Bufferlistsw.
 Commands for invoking this plugin.
 
 :Bufferlist    - Opens the buffer list window at the very top with maximum width.
+
 :Bufferlistsw  - Opens the buffer list window at the top of the current window, with same width as that of current window.
 
 
