@@ -21,9 +21,9 @@ The plugin exports two command Bufferlist and Bufferlistsw.
 
 Commands for invoking this plugin.
 
-:Bufferlist    - Opens the buffer list window at the very top with maximum width.
+**:Bufferlist**    - Opens the buffer list window at the very top with maximum width.
 
-:Bufferlistsw  - Opens the buffer list window at the top of the current window, with same width as that of current window.
+**:Bufferlistsw**  - Opens the buffer list window at the top of the current window, with same width as that of current window.
 
 
 When the plugin is invoked, it opens a horizontal window at the top. This window contains a list of buffers, sorted in the most recently used order. The cursor is placed on the line of the buffer that user accessed before the current buffer. This is to make switching between two buffers very fast.
