@@ -354,13 +354,17 @@ function! s:closewindow(force)
 			if(getbufvar(str2nr(s:displayed[l:llindex][0]),'&modified') && a:force == 0 ) 
 				call s:printmessage("Buffer contents modified. Use 'X' to force close.")
 			else
-				exe s:buflistwindow . ' wincmd w'
-				call s:close()
-				exe "tabn" .s:displayed[l:llindex][1]
-				exe s:displayed[l:llindex][2]. ' wincmd w'
-				:q!
-				exe "tabn". s:sourcetab
-				call s:toggle(0)
+				if(tabpagenr('$')==1 && winnr('$')==2)
+					call s:printmessage("Not closing last window of the last tab.")
+				else
+					exe s:buflistwindow . ' wincmd w'
+					call s:close()
+					exe "tabn" .s:displayed[l:llindex][1]
+					exe s:displayed[l:llindex][2]. ' wincmd w'
+					:q!
+					exe "tabn". s:sourcetab
+					call s:toggle(0)
+				endif
 			endif
 		else
 			call s:printmessage("Buffer not showing in any tab.")
