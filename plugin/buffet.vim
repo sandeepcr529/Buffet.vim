@@ -52,6 +52,7 @@ function! s:open_new_window(dim)
 	setlocal bufhidden=hide
 	setlocal noswapfile
 	setlocal nowrap
+	setlocal ft=buffet
 	return bufnr('%')
 endfunction 
 function! s:open_new_vertical_window(dim)
