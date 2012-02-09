@@ -191,7 +191,7 @@ function! s:getallbuffers()
 	for i in l:buffers
 		let l:bufname = bufname(i)
 			if(strlen(l:bufname)==0) 	
-				continue	
+				let l:bufname = "[No Name]"
 			endif
 		let l:return[i] = l:bufname
 	endfor
@@ -264,43 +264,43 @@ function! s:toggle(gotolastbuffer)
 	call s:display_buffer_list(a:gotolastbuffer)
 	"call matchadd('String','[\/\\][^\/\\]*$')  
 	setlocal nomodifiable
-	map <buffer> <silent> <2-leftrelease> :call <sid>loadbuffer(0)<cr>
-	map <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
-	map <buffer> <silent> <C-M> :call <sid>loadbuffer(0)<cr>
-	map <buffer> <silent> x :call <sid>closewindow(0)<cr>
-	map <buffer> <silent> X :call <sid>closewindow(1)<cr>
-	map <buffer> <silent> c :call <sid>cleardiff()<cr>
-	map <buffer> <silent> C :call <sid>cleardiff()<cr>
-	map <buffer> <silent> d :call <sid>deletebuffer(0)<cr>
-	map <buffer> <silent> D :call <sid>deletebuffer(1)<cr>
-	map <buffer> <silent> o :call <sid>loadbuffer(1)<cr>
-	map <buffer> <silent> O :call <sid>loadbuffer(1)<cr>
-	map <buffer> <silent> g :call <sid>gotowindow()<cr>
-	map <buffer> <silent> G :call <sid>gotowindow()<cr>
-	map <buffer> <silent> s :call <sid>split('h')<cr>
-	map <buffer> <silent> S :call <sid>split('h')<cr>
-	map <buffer> <silent> t :call <sid>openintab()<cr>
-	map <buffer> <silent> T :call <sid>openintab()<cr>
-	map <buffer> <silent> hh :call <sid>split('h')<cr>
-	map <buffer> <silent> HH :call <sid>split('h')<cr>
-	map <buffer> <silent> v :call <sid>split('v')<cr>
-	map <buffer> <silent> V :call <sid>split('v')<cr>
-	map <buffer> <silent> r :call <sid>refresh()<cr>
-	map <buffer> <silent> 0 :call <sid>press(0)<cr>
-	map <buffer> <silent> 1 :call <sid>press(1)<cr>
-	map <buffer> <silent> 2 :call <sid>press(2)<cr>
-	map <buffer> <silent> 3 :call <sid>press(3)<cr>
-	map <buffer> <silent> 4 :call <sid>press(4)<cr>
-	map <buffer> <silent> 5 :call <sid>press(5)<cr>
-	map <buffer> <silent> 6 :call <sid>press(6)<cr>
-	map <buffer> <silent> 7 :call <sid>press(7)<cr>
-	map <buffer> <silent> 8 :call <sid>press(8)<cr>
-	map <buffer> <silent> 9 :call <sid>press(9)<cr>
-	map <buffer> <silent> - :call <sid>diff_split('v')<cr>
-	map <buffer> <silent> m :call <sid>toggle_detail()<cr>
-	map <buffer> <silent> M :call <sid>toggle_detail()<cr>
-	map <buffer> <silent> <BS> :call <sid>press(-1)<cr>
-	map <buffer> <silent> <Esc> :call <sid>close()<cr>
+	nnoremap <buffer> <silent> <2-leftrelease> :call <sid>loadbuffer(0)<cr>
+	nnoremap <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
+	nnoremap <buffer> <silent> <C-M> :call <sid>loadbuffer(0)<cr>
+	nnoremap <buffer> <silent> x :call <sid>closewindow(0)<cr>
+	nnoremap <buffer> <silent> X :call <sid>closewindow(1)<cr>
+	nnoremap <buffer> <silent> c :call <sid>cleardiff()<cr>
+	nnoremap <buffer> <silent> C :call <sid>cleardiff()<cr>
+	nnoremap <buffer> <silent> d :call <sid>deletebuffer(0)<cr>
+	nnoremap <buffer> <silent> D :call <sid>deletebuffer(1)<cr>
+	nnoremap <buffer> <silent> o :call <sid>loadbuffer(1)<cr>
+	nnoremap <buffer> <silent> O :call <sid>loadbuffer(1)<cr>
+	nnoremap <buffer> <silent> g :call <sid>gotowindow()<cr>
+	nnoremap <buffer> <silent> G :call <sid>gotowindow()<cr>
+	nnoremap <buffer> <silent> s :call <sid>split('h')<cr>
+	nnoremap <buffer> <silent> S :call <sid>split('h')<cr>
+	nnoremap <buffer> <silent> t :call <sid>openintab()<cr>
+	nnoremap <buffer> <silent> T :call <sid>openintab()<cr>
+	nnoremap <buffer> <silent> hh :call <sid>split('h')<cr>
+	nnoremap <buffer> <silent> HH :call <sid>split('h')<cr>
+	nnoremap <buffer> <silent> v :call <sid>split('v')<cr>
+	nnoremap <buffer> <silent> V :call <sid>split('v')<cr>
+	nnoremap <buffer> <silent> r :call <sid>refresh()<cr>
+	nnoremap <buffer> <silent> 0 :call <sid>press(0)<cr>
+	nnoremap <buffer> <silent> 1 :call <sid>press(1)<cr>
+	nnoremap <buffer> <silent> 2 :call <sid>press(2)<cr>
+	nnoremap <buffer> <silent> 3 :call <sid>press(3)<cr>
+	nnoremap <buffer> <silent> 4 :call <sid>press(4)<cr>
+	nnoremap <buffer> <silent> 5 :call <sid>press(5)<cr>
+	nnoremap <buffer> <silent> 6 :call <sid>press(6)<cr>
+	nnoremap <buffer> <silent> 7 :call <sid>press(7)<cr>
+	nnoremap <buffer> <silent> 8 :call <sid>press(8)<cr>
+	nnoremap <buffer> <silent> 9 :call <sid>press(9)<cr>
+	nnoremap <buffer> <silent> - :call <sid>diff_split('v')<cr>
+	nnoremap <buffer> <silent> m :call <sid>toggle_detail()<cr>
+	nnoremap <buffer> <silent> M :call <sid>toggle_detail()<cr>
+	nnoremap <buffer> <silent> <BS> :call <sid>press(-1)<cr>
+	nnoremap <buffer> <silent> <Esc> :call <sid>close()<cr>
 	augroup  Tlistaco1
 			autocmd!
 			au  BufLeave <buffer> call <sid>close()
@@ -521,3 +521,4 @@ augroup END
 
 command! Bufferlist :call <sid>toggletop()
 command! Bufferlistsw :call <sid>togglesw()
+
