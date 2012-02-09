@@ -264,7 +264,7 @@ function! s:toggle(gotolastbuffer)
 	call s:display_buffer_list(a:gotolastbuffer)
 	"call matchadd('String','[\/\\][^\/\\]*$')  
 	setlocal nomodifiable
-	nnoremap <buffer> <silent> <2-leftrelease> :call <sid>loadbuffer(0)<cr>
+	map <buffer> <silent> <2-leftrelease> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-M> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> x :call <sid>closewindow(0)<cr>
