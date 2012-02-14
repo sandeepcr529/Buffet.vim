@@ -5,7 +5,7 @@
 " Usage:
 "
 " Copy the file buffet.vim to the plugins directory.
-" The command to open the buffer list is 
+" The command to open the buffer list is
 " :Bufferlist
 "
 " A horizontal window is opened with a list of buffer. the buffer numbers are
@@ -13,29 +13,29 @@
 "
 " 1.Entering the buffer number using keyboard. Just start typing the number using keyboard.
 " The plugin will search for the buffer with that number and will keep going to the matching
-" buffers. Entered number will be shown at the top you can use backspace to edit it.When you 
+" buffers. Entered number will be shown at the top you can use backspace to edit it.When you
 " are in the desired buffer, press enter or any control keys that are
 " displayed at the bottom to execute any command available, on that buffer
 "
 " Available commands
-" 
-" Enter(Replace current buffer) 
-" o - make window fill with selected buffer 
-" hh - (Horizontal Split) 
-" v - (Vertical Split) 
-" - - (Vertical Diff Split) 
-" g - (Go to buffer window if it is visible in any tab) 
-" d - (Delete selected buffer) 
-" x - (Close window) 
-" c - (Clear diff flags for all windows) 
+"
+" Enter(Replace current buffer)
+" o - make window fill with selected buffer
+" hh - (Horizontal Split)
+" v - (Vertical Split)
+" - - (Vertical Diff Split)
+" g - (Go to buffer window if it is visible in any tab)
+" d - (Delete selected buffer)
+" x - (Close window)
+" c - (Clear diff flags for all windows)
 "
 " 2.Move up or down using the navigation keys to reach the buffer line.
 "
 " 3.Doubleclick on a buffer line using the mouse. Will immediatly switch to
 " that buffer
 "
-" To make this plugin really useful you have to assign a shortcut key for it, 
-" say you want F2 key to open the buffer list. you can add the following line in your .vimrc file. 
+" To make this plugin really useful you have to assign a shortcut key for it,
+" say you want F2 key to open the buffer list. you can add the following line in your .vimrc file.
 "
 " map <F2> :Bufferlist<CR>
 "
@@ -43,8 +43,13 @@
 " Maintainer:	Sandeep.c.r<sandeepcr2@gmail.com>
 "
 "
+if exists("g:loaded_buffet")
+	finish
+endif
+let g:loaded_buffet = 1
+
 function! s:open_new_window(dim)
-	exe s:currentposition. ' '.a:dim . 'new buflisttempbuffer412393'  
+	exe s:currentposition. ' '.a:dim . 'new buflisttempbuffer412393'
 	set nonu
 	setlocal bt=nofile
 	setlocal modifiable
@@ -54,16 +59,16 @@ function! s:open_new_window(dim)
 	setlocal nowrap
 	setlocal ft=buffet
 	return bufnr('%')
-endfunction 
+endfunction
 function! s:open_new_vertical_window(dim)
-	exe a:dim . 'vnew' 
+	exe a:dim . 'vnew'
 	set nonu
 	setlocal bt=nofile
 	setlocal bt=nowrite
 	setlocal bufhidden=hide
 	setlocal noswapfile
 	return bufnr('%')
-endfunction 	
+endfunction
 function! s:cursormove()
 	let s:lineonclose = line('.')
 	if(s:lineonclose >len(s:displayed)+1)
@@ -73,7 +78,7 @@ function! s:cursormove()
 	endif
 endfunction
 function! s:buffet_pathshorten(str)
-	if(s:detail == 1) 
+	if(s:detail == 1)
 		return a:str
 	else
 		return pathshorten(a:str)
@@ -87,15 +92,15 @@ function! s:display_buffer_list(gotolastbuffer)
 	let l:maxlen = 0
 	let l:headmaxlen = 0
 	for l:i in keys(s:bufferlistlite)
-		if(index(s:bufrecent,l:i)==-1) 
+		if(index(s:bufrecent,l:i)==-1)
 			call add(s:bufrecent,l:i)
 		endif
 		let l:temp = strlen(fnamemodify(s:bufferlistlite[l:i],':t'))
 		let l:headtemp = strlen(s:buffet_pathshorten(fnamemodify(s:bufferlistlite[l:i],':h')))
-		if(l:headtemp > l:headmaxlen) 
+		if(l:headtemp > l:headmaxlen)
 			let l:headmaxlen = l:headtemp
 		endif
-		if(l:temp > l:maxlen) 
+		if(l:temp > l:maxlen)
 			let l:maxlen = l:temp
 		endif
 	endfor
@@ -107,9 +112,9 @@ function! s:display_buffer_list(gotolastbuffer)
 			let l:bufname = s:bufferlistlite[l:i]
 			let l:buftailname =fnamemodify(l:bufname,':t')
 			let l:bufheadlname =s:buffet_pathshorten(fnamemodify(l:bufname,':h'))
-			if(getbufvar(l:thisbufno,'&modified')) 
+			if(getbufvar(l:thisbufno,'&modified'))
 				let l:modifiedflag = " (+) "
-			else 
+			else
 				let l:modifiedflag = "     "
 			endif
 			let l:padlength = l:maxlen - strlen(l:buftailname) + 2
@@ -138,7 +143,7 @@ function! s:display_buffer_list(gotolastbuffer)
 				let l:line += 1
 				if(l:thistab == s:sourcetab && l:thiswindow == s:sourcewindow)
 					call setline(l:line,'> '.l:padstring."Tab:".l:thistab." window:".l:thiswindow." <")
-				else 
+				else
 					call setline(l:line,'  '.l:padstring."Tab:".l:thistab." window:".l:thiswindow)
 				endif
 				call add(s:displayed,[l:thisbufno,l:thistab,l:thiswindow])
@@ -160,7 +165,7 @@ function! s:display_buffer_list(gotolastbuffer)
 	if(a:gotolastbuffer==1)
 		call cursor(s:last_buffer_line,3)
 	else
-		if(s:lineonclose >len(s:displayed)+1) 
+		if(s:lineonclose >len(s:displayed)+1)
 			let s:lineonclose -=1
 		endif
 		call cursor(s:lineonclose,3)
@@ -181,7 +186,7 @@ function! s:place_sign()
 	setlocal cursorline
 	return
 	exec "sign unplace *"
-	exec "sign define lineh linehl=Search texthl=Search" 
+	exec "sign define lineh linehl=Search texthl=Search"
 	exec "sign place 10 name=lineh line=".line('.')." buffer=" . t:tlistbuf
 endfunction
 
@@ -190,7 +195,7 @@ function! s:getallbuffers()
 	let l:return = {}
 	for i in l:buffers
 		let l:bufname = bufname(i)
-			if(strlen(l:bufname)==0) 	
+			if(strlen(l:bufname)==0)
 				let l:bufname = "[No Name]"
 			endif
 		let l:return[i] = l:bufname
@@ -262,7 +267,7 @@ function! s:toggle(gotolastbuffer)
 	let s:buflistwindow = winnr()
 	setlocal cursorline
 	call s:display_buffer_list(a:gotolastbuffer)
-	"call matchadd('String','[\/\\][^\/\\]*$')  
+	"call matchadd('String','[\/\\][^\/\\]*$')
 	setlocal nomodifiable
 	map <buffer> <silent> <2-leftrelease> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
@@ -323,7 +328,7 @@ function! s:deletebuffer(force)
 	let l:llindex= line('.') - 2
 	if(exists("s:displayed[l:llindex]") )
 		let l:selectedbuffer = str2nr(s:displayed[l:llindex][0])
-			if(getbufvar(str2nr(l:selectedbuffer),'&modified') && a:force == 0 ) 
+			if(getbufvar(str2nr(l:selectedbuffer),'&modified') && a:force == 0 )
 				call s:printmessage("Buffer contents modified. Use 'D' to force delete.")
 			else
 				call s:toggle(0)
@@ -352,7 +357,7 @@ function! s:closewindow(force)
 	let l:llindex= line('.') - 2
 	if(exists("s:displayed[l:llindex]"))
 		if(exists("s:displayed[l:llindex][1]"))
-			if(getbufvar(str2nr(s:displayed[l:llindex][0]),'&modified') && a:force == 0 ) 
+			if(getbufvar(str2nr(s:displayed[l:llindex][0]),'&modified') && a:force == 0 )
 				call s:printmessage("Buffer contents modified. Use 'X' to force close.")
 			else
 				if(tabpagenr('$')==1 && winnr('$')==2)
@@ -436,7 +441,7 @@ function! s:goto_buffer(bufferno)
 	if(exists("s:buftotabwindow[a:bufferno]"))
 		let l:tabno = s:buftotabwindow[a:bufferno][0]
 		let l:winno = s:buftotabwindow[a:bufferno][1]
-		exe "tabn" .l:tabno 
+		exe "tabn" .l:tabno
 		exe l:winno. ' wincmd w'
 	endif
 endfunction
@@ -494,7 +499,7 @@ endfunction
 function! s:updaterecent()
 		let l:bufname = bufname("%")
 		let l:j = bufnr('%')
-		if(strlen(l:bufname) > 0 && getbufvar(l:j,'&modifiable')  ) 
+		if(strlen(l:bufname) > 0 && getbufvar(l:j,'&modifiable')  )
 			call filter(s:bufrecent, 'v:val !='. l:j)
 			call insert(s:bufrecent,l:j.'')
 		endif
