@@ -1,4 +1,4 @@
-" Buffet Plugin for VIM > 7.3 version 2.10
+" Buffet Plugin for VIM > 7.3 version 2.50
 "
 " A fast, simple and easy to use pluggin for switching and managing buffers.
 "
@@ -39,7 +39,28 @@
 "
 " map <F2> :Bufferlist<CR>
 "
-" Last Change:	2012 Jan
+" With this version you can format the display of buffer list using a callback
+" function. Set the call back using the line in your vimrc
+"	
+"	let g:Buffetbufferformatfunction = "s:callback"
+"
+" The call back function accept following parameters and must return a one
+" dimensional list of columns. If empty list is returned, the entry is not
+" displayed.
+"
+" Buffer No, The buffer number
+" Tab No, Tab no where this buffer is displayed. Blank if it is not displayed in a tab.
+" Window No. Window no where this buffer is displayed. Blank if not displayed.
+" Source tab: The tab from which the bufet was invoked. This can be used to mark the current buffer in the list
+" Source window: Same as above, but from window.
+" Is parent. This is 1 if this is a first entry for a buffer in the list. If buffer is showing in multiple tabs and windows, those entries will have this value 0.
+"
+" You can disable default maps if you set this line in vimrc
+"    let g:buffetdisabledefaultmaps = 1
+" You can now set youe own maps to the commands given at the end of this file
+" instead.
+"
+" Last Change:	2012 March
 " Maintainer:	Sandeep.c.r<sandeepcr2@gmail.com>
 "
 "
@@ -51,6 +72,7 @@ let g:loaded_buffet = 1
 function! s:open_new_window(dim)
 	exe s:currentposition. ' '.a:dim . 'new buflisttempbuffer412393'
 	set nonu
+	set nornu
 	setlocal bt=nofile
 	setlocal modifiable
 	setlocal bt=nowrite
@@ -79,91 +101,135 @@ function! s:cursormove()
 endfunction
 function! s:buffet_pathshorten(str)
 	if(s:detail == 1)
-		return a:str
+		return fnamemodify(a:str,':p')
 	else
-		return pathshorten(a:str)
+		return pathshorten(fnamemodify(a:str,':p'))
 	endif
 endfunction
+function! s:callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
+			if(getbufvar(a:bufno,'&modified'))
+				let l:modifiedflag = " (+) "
+			else
+				let l:modifiedflag = "     "
+			endif
+	if(a:tabno != '') 
+		let l:tabno = "Tab-".a:tabno." "
+	else
+		let l:tabno = ''
+	endif
+	if(a:windowno != '') 
+		let l:windowno = "Window-".a:windowno
+	else
+		let l:windowno = ''
+	endif
+	if((a:windowno == a:srcwindow ) && (a:tabno == a:srctab))
+		let l:fc = '>'
+		let l:windowno .= ' <'
+	else 
+		let l:fc = ' '
+	endif
+	if(a:isparent == 1)
+		return [l:fc,a:bufno,fnamemodify(s:bufferlistlite[a:bufno]."   ",':t'),s:buffet_pathshorten(s:bufferlistlite[a:bufno]),l:modifiedflag,l:tabno,l:windowno]
+	else
+		return [l:fc,'','','','',l:tabno,l:windowno]
+	endif
+endfunction
+function! s:process_callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
+	let l:return = s:callbackref(a:bufno,a:tabno,a:windowno,a:srctab,a:srcwindow,a:isparent)
+	if(empty(l:return)) 
+		return []
+	endif
+	let l:cn = 0
+	let l:cw = []
+	for l:i in l:return
+		let l:temp =  strwidth(l:i)
+		call add(l:cw,l:temp)
+		if(s:columnwidths[l:cn] < l:temp ) 
+			let s:columnwidths[l:cn] = l:temp
+		endif
+		let l:cn += 1
+	endfor
+	return [l:return,l:cw]
+endfunction
 function! s:display_buffer_list(gotolastbuffer)
+	call s:setcallback(g:Buffetbufferformatfunction)
+	let s:columnwidths = repeat([3],50)
 	let l:line = 2
 	let l:fg = synIDattr(hlID('Statement'),'fg','gui')
 	let l:bg = synIDattr(hlID('CursorLine'),'bg','gui')
 	call filter(s:bufrecent,'exists("s:bufferlistlite[v:val]") && v:val!=t:tlistbuf' )
-	let l:maxlen = 0
-	let l:headmaxlen = 0
 	for l:i in keys(s:bufferlistlite)
 		if(index(s:bufrecent,l:i)==-1)
 			call add(s:bufrecent,l:i)
-		endif
-		let l:temp = strlen(fnamemodify(s:bufferlistlite[l:i],':t'))
-		let l:headtemp = strlen(s:buffet_pathshorten(fnamemodify(s:bufferlistlite[l:i],':h')))
-		if(l:headtemp > l:headmaxlen)
-			let l:headmaxlen = l:headtemp
-		endif
-		if(l:temp > l:maxlen)
-			let l:maxlen = l:temp
 		endif
 	endfor
 	call setline(1,"Buffet-2.10 ( Enter Number to search for a buffer number )")
 	let s:displayed = []
 	let s:last_buffer_line = 0
+	let l:columns = []
 	for l:i in s:bufrecent
+			let l:short_file_name = ''
 			let l:thisbufno = str2nr(l:i)
-			let l:bufname = s:bufferlistlite[l:i]
-			let l:buftailname =fnamemodify(l:bufname,':t')
-			let l:bufheadlname =s:buffet_pathshorten(fnamemodify(l:bufname,':h'))
-			if(getbufvar(l:thisbufno,'&modified'))
-				let l:modifiedflag = " (+) "
-			else
-				let l:modifiedflag = "     "
-			endif
-			let l:padlength = l:maxlen - strlen(l:buftailname) + 2
-			let l:padlengthhead= l:headmaxlen - strlen(l:bufheadlname) + 2
-			let l:short_file_name = repeat(' ',2-strlen(l:i)).l:i .'  '. l:buftailname.repeat(' ',l:padlength) .l:modifiedflag. l:bufheadlname .repeat(' ',l:padlengthhead)
-			let l:padstring = repeat(' ',len(l:short_file_name))
 			if(exists("s:buftotabwindow[l:thisbufno]"))
 				let l:thistab = s:buftotabwindow[l:thisbufno][0][0]
 				let l:thiswindow = s:buftotabwindow[l:thisbufno][0][1]
-				let l:short_file_name = l:short_file_name ." Tab:".l:thistab." Window:".l:thiswindow
-				call add(s:displayed,[l:thisbufno,l:thistab,l:thiswindow])
-				if(l:thistab == s:sourcetab && l:thiswindow == s:sourcewindow)
-					let l:short_file_name = '>'.l:short_file_name ." <"
-				else
-					let l:short_file_name = ' '.l:short_file_name
+				let l:temp =  s:process_callback(l:thisbufno,l:thistab,l:thiswindow,s:sourcetab,s:sourcewindow,1)
+				if(!empty(l:temp))
+					call add(l:columns,l:temp)
+					call add(s:displayed,[l:thisbufno,l:thistab,l:thiswindow])
 				endif
 			else
-				let l:short_file_name = ' '.l:short_file_name
-				call add(s:displayed,[l:thisbufno])
+				let l:temp =  s:process_callback(l:thisbufno,'','',s:sourcetab,s:sourcewindow,1)
+				if(!empty(l:temp))
+					call add(l:columns,l:temp)
+					call add(s:displayed,[l:thisbufno])
+				endif
 			endif
-			call setline(l:line,l:short_file_name)
+			"call setline(l:line,l:short_file_name)
 			let l:subwindow = 1
 			while(exists("s:buftotabwindow[l:thisbufno][l:subwindow]"))
 				let l:thistab = s:buftotabwindow[l:thisbufno][l:subwindow][0]
 				let l:thiswindow = s:buftotabwindow[l:thisbufno][l:subwindow][1]
-				let l:line += 1
-				if(l:thistab == s:sourcetab && l:thiswindow == s:sourcewindow)
-					call setline(l:line,'> '.l:padstring."Tab:".l:thistab." window:".l:thiswindow." <")
-				else
-					call setline(l:line,'  '.l:padstring."Tab:".l:thistab." window:".l:thiswindow)
+				let l:temp =  s:process_callback(l:thisbufno,l:thistab,l:thiswindow,s:sourcetab,s:sourcewindow,0)
+				if(!empty(l:temp))
+					call add(l:columns,l:temp)
+					call add(s:displayed,[l:thisbufno,l:thistab,l:thiswindow])
 				endif
-				call add(s:displayed,[l:thisbufno,l:thistab,l:thiswindow])
 				let l:subwindow += 1
 			endwhile
-			if(s:last_buffer_line == 0)
-				let s:last_buffer_line = l:line+1
-			endif
-			let l:line += 1
+
 	endfor
+	let l:line = 2
+	for l:row_and_cw in l:columns
+		let l:columns_in_a_row = l:row_and_cw[0]
+		let l:column_widths = l:row_and_cw[1]
+		let l:cc = 0
+		let l:linecontent = ''
+		for l:column in l:columns_in_a_row
+			let l:linecontent = l:linecontent . l:column . repeat(' ',s:columnwidths[l:cc] - l:column_widths[l:cc])
+			let l:cc += 1
+		endfor
+		call setline(l:line,l:linecontent)
+		let l:line += 1
+	endfor
+	if(s:last_buffer_line == 0)
+		let s:last_buffer_line = l:line+1
+	endif
 	exe "resize ".(len(s:displayed)+4)
 	call setline(l:line,"")
 	let l:line+=1
-	call setline(l:line,"Enter(Load buffer) | hh/v/-/c (Horizontal/Vertical/Vertical Diff Split/Clear Diff) | o(Maximize) | t(New tab) | m(Toggle detail) | g(Go to window) | d(Delete buffer) | x(Close window) ")
+	if(!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
+		call setline(l:line,"Enter(Load buffer) | hh/v/-/c (Horizontal/Vertical/Vertical Diff Split/Clear Diff) | o(Maximize) | t(New tab) | m(Toggle detail) | g(Go to window) | d(Delete buffer) | x(Close window) ")
+	else
+		call setline(l:line,"Default mappings disabled.")
+	endif
 	let l:fg = synIDattr(hlID('Statement'),'fg','Question')
 	exe 'highlight buffethelpline guibg=black'
 	exe 'highlight buffethelpline guifg=orange'
 	exe '2match buffethelpline /\%1l\|\%'.l:line.'l.\%>1c/'
 	if(a:gotolastbuffer==1)
-		call cursor(s:last_buffer_line,3)
+		"call cursor(s:last_buffer_line,3)
+		call cursor(3,3)
 	else
 		if(s:lineonclose >len(s:displayed)+1)
 			let s:lineonclose -=1
@@ -272,25 +338,27 @@ function! s:toggle(gotolastbuffer)
 	map <buffer> <silent> <2-leftrelease> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-M> :call <sid>loadbuffer(0)<cr>
-	nnoremap <buffer> <silent> x :call <sid>closewindow(0)<cr>
-	nnoremap <buffer> <silent> X :call <sid>closewindow(1)<cr>
-	nnoremap <buffer> <silent> c :call <sid>cleardiff()<cr>
-	nnoremap <buffer> <silent> C :call <sid>cleardiff()<cr>
-	nnoremap <buffer> <silent> d :call <sid>deletebuffer(0)<cr>
-	nnoremap <buffer> <silent> D :call <sid>deletebuffer(1)<cr>
-	nnoremap <buffer> <silent> o :call <sid>loadbuffer(1)<cr>
-	nnoremap <buffer> <silent> O :call <sid>loadbuffer(1)<cr>
-	nnoremap <buffer> <silent> g :call <sid>gotowindow()<cr>
-	nnoremap <buffer> <silent> G :call <sid>gotowindow()<cr>
-	nnoremap <buffer> <silent> s :call <sid>split('h')<cr>
-	nnoremap <buffer> <silent> S :call <sid>split('h')<cr>
-	nnoremap <buffer> <silent> t :call <sid>openintab()<cr>
-	nnoremap <buffer> <silent> T :call <sid>openintab()<cr>
-	nnoremap <buffer> <silent> hh :call <sid>split('h')<cr>
-	nnoremap <buffer> <silent> HH :call <sid>split('h')<cr>
-	nnoremap <buffer> <silent> v :call <sid>split('v')<cr>
-	nnoremap <buffer> <silent> V :call <sid>split('v')<cr>
-	nnoremap <buffer> <silent> r :call <sid>refresh()<cr>
+	if(!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
+		nnoremap <buffer> <silent> x :call <sid>closewindow(0)<cr>
+		nnoremap <buffer> <silent> X :call <sid>closewindow(1)<cr>
+		nnoremap <buffer> <silent> c :call <sid>cleardiff()<cr>
+		nnoremap <buffer> <silent> C :call <sid>cleardiff()<cr>
+		nnoremap <buffer> <silent> d :call <sid>deletebuffer(0)<cr>
+		nnoremap <buffer> <silent> D :call <sid>deletebuffer(1)<cr>
+		nnoremap <buffer> <silent> o :call <sid>loadbuffer(1)<cr>
+		nnoremap <buffer> <silent> O :call <sid>loadbuffer(1)<cr>
+		nnoremap <buffer> <silent> g :call <sid>gotowindow()<cr>
+		nnoremap <buffer> <silent> G :call <sid>gotowindow()<cr>
+		nnoremap <buffer> <silent> s :call <sid>split('h')<cr>
+		nnoremap <buffer> <silent> S :call <sid>split('h')<cr>
+		nnoremap <buffer> <silent> t :call <sid>openintab()<cr>
+		nnoremap <buffer> <silent> T :call <sid>openintab()<cr>
+		nnoremap <buffer> <silent> hh :call <sid>split('h')<cr>
+		nnoremap <buffer> <silent> HH :call <sid>split('h')<cr>
+		nnoremap <buffer> <silent> v :call <sid>split('v')<cr>
+		nnoremap <buffer> <silent> V :call <sid>split('v')<cr>
+		nnoremap <buffer> <silent> r :call <sid>refresh()<cr>
+	endif
 	nnoremap <buffer> <silent> 0 :call <sid>press(0)<cr>
 	nnoremap <buffer> <silent> 1 :call <sid>press(1)<cr>
 	nnoremap <buffer> <silent> 2 :call <sid>press(2)<cr>
@@ -509,6 +577,9 @@ function! s:savelineno()
 	let s:buflinenos[bufnr('%')] = line('.')
 endfunction
 
+function! s:setcallback(func)
+	let s:callbackref = function(a:func)
+endfunction
 let s:bufrecent = []
 let s:buflinenos = {}
 let s:bufferlistlite =  {}
@@ -526,4 +597,23 @@ augroup END
 
 command! Bufferlist :call <sid>toggletop()
 command! Bufferlistsw :call <sid>togglesw()
+command! -nargs=1 Bufferformatfunction :call <sid>setcallback(<args>)
+command! Buffetclosewindow :call <sid>closewindow(0)
+command! Buffetclosewindowf :call <sid>closewindow(1)
+command! Buffetcleardiff :call <sid>cleardiff()
+command! Buffetdelete  :call <sid>deletebuffer(0)
+command! Buffetdeletef :call <sid>deletebuffer(1)
+command! Buffetload :call <sid>loadbuffer(1)
+command! Buffetloadonly :call <sid>loadbuffer(1)
+command! Buffetgoto :call <sid>gotowindow()
+command! Buffetopentab :call <sid>openintab()
+command! Buffetopenh :call <sid>split('h')
+command! Buffetopenv :call <sid>split('v')
+command! Buffetrefresh :call <sid>refresh()
+command! Buffetdiffsplit :call <sid>diff_split('v')
+command! Buffettoggledetail :call <sid>toggle_detail()
+
+if(!exists("g:Buffetbufferformatfunction"))
+	let g:Buffetbufferformatfunction = "s:callback"
+endif
 

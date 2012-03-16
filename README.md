@@ -77,3 +77,35 @@ This command closes the selected window. It does not matter if the window is ope
 ### m
 
 Toggles the detailed view for file paths.
+
+
+With this version you can format the display of buffer list using a callback.
+
+function. Set the call back using the line in your vimrc
+   
+   let g:Buffetbufferformatfunction = "s:callback"
+
+The call back function accept following parameters and must return a one
+dimensional list of columns. If empty list is returned, the entry is not
+displayed.
+
+Buffer No, The buffer number
+
+Tab No, Tab no where this buffer is displayed. Blank if it is not displayed in a tab.
+
+Window No. Window no where this buffer is displayed. Blank if not displayed.
+
+Source tab: The tab from which the bufet was invoked. This can be used to mark the current buffer in the list
+
+Source window: Same as above, but from window.
+
+Is parent. This is 1 if this is a first entry for a buffer in the list. If buffer is showing in multiple tabs and windows, those entries will have this value 0.
+
+
+
+You can disable default maps if you set this line in vimrc
+
+   let g:buffetdisabledefaultmaps = 1
+
+You can now set youe own maps to the commands given at the end of this file
+instead.
