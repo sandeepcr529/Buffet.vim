@@ -30,20 +30,33 @@ You can disable default maps if you set this line in vimrc
 
 You can now set your own maps to the commands given below.
 
-Buffetclosewindow  - Close the corresponding window.
-BuffetclosewindowF - Close the window even if the contents are not saved
-Buffetcleardiff    - Clears diff flag of all displayed windows.
-Buffetdelete       - Delete the selected buffer 
-Buffetdeletef      - Delete the buffer even if contents are not saved
-Buffetload         - Load the selected buffer to current windows
-Buffetloadonly     - Load the selected buffer to current window and make it the only one displayed.
-Buffetgoto         - Go to the selected tab/window/buffer   
-Buffetopentab      - Open the selected buffer in a new tab
-Buffetopenh        - Open the buffer in a horizintal split
-Buffetopenv        - Open the buffer in a vertical split  
-Buffetrefresh      - Refresh the buffer list.
-Buffetdiffsplit    - Open a diff window with difference between current buffer and selected buffer shown.
-Buffettoggledetail - Toggle detailed display of file path
+* Buffetclosewindow  - Close the corresponding window
+ 
+* BuffetclosewindowF - Close the window even if the contents are not saved
+ 
+* Buffetcleardiff    - Clears diff flag of all displayed windows
+ 
+* Buffetdelete       - Delete the selected buffer 
+ 
+* Buffetdeletef      - Delete the buffer even if contents are not saved
+ 
+* Buffetload         - Load the selected buffer to current windows
+ 
+* Buffetloadonly     - Load the selected buffer to current window and make it the only one displayed
+ 
+* Buffetgoto         - Go to the selected tab/window/buffer   
+ 
+* Buffetopentab      - Open the selected buffer in a new tab
+ 
+* Buffetopenh        - Open the buffer in a horizintal split
+ 
+* Buffetopenv        - Open the buffer in a vertical split  
+ 
+* Buffetrefresh      - Refresh the buffer list.
+ 
+* Buffetdiffsplit    - Open a diff window with difference between current buffer and selected buffer shown
+ 
+* Buffettoggledetail - Toggle detailed display of file path
 
 
 New in version 2.10[(Screenshot)](http://i43.tinypic.com/33kadsx.png)
