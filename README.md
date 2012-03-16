@@ -3,9 +3,7 @@ Buffet is a plugin for the vim editor for listing and switching buffers, windows
 
 New in version 2.50
 
-With this version you can format the display of buffer list using a callback.
-
-function. Set the call back using the line in your vimrc
+With this version you can format the display of buffer list using a callback function. Set the call back using the line in your vimrc
    
    let g:Buffetbufferformatfunction = "s:callback"
 
