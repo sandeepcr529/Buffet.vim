@@ -7,28 +7,44 @@ With this version you can format the display of buffer list using a callback fun
    
    let g:Buffetbufferformatfunction = "s:callback"
 
-The call back function accept following parameters and must return a one
-dimensional list of columns. If empty list is returned, the entry is not
+You can replace s:callback with your callback function name.  The call back function accept following parameters and must return a one dimensional list of columns. If empty list is returned, the entry is not
 displayed.
 
-Buffer No, The buffer number
+Parameters:
 
-Tab No, Tab no where this buffer is displayed. Blank if it is not displayed in a tab.
+* Buffer No, The buffer number
 
-Window No. Window no where this buffer is displayed. Blank if not displayed.
+* Tab No, Tab no where this buffer is displayed. Blank if it is not displayed in a tab.
 
-Source tab: The tab from which the bufet was invoked. This can be used to mark the current buffer in the list
+* Window No. Window no where this buffer is displayed. Blank if not displayed.
 
-Source window: Same as above, but from window.
+* Source tab: The tab from which the bufet was invoked. This can be used to mark the current buffer in the list
 
-Is parent. This is 1 if this is a first entry for a buffer in the list. If buffer is showing in multiple tabs and windows, those entries will have this value 0.
+* Source window: Same as above, but from window.
+
+* Is parent. This is 1 if this is a first entry for a buffer in the list. If buffer is showing in multiple tabs and windows, those entries will have this value 0.
 
 You can disable default maps if you set this line in vimrc
 
    let g:buffetdisabledefaultmaps = 1
 
-You can now set youe own maps to the commands given at the end of this file
-instead.
+You can now set your own maps to the commands given below.
+
+Buffetclosewindow  - Close the corresponding window.
+BuffetclosewindowF - Close the window even if the contents are not saved
+Buffetcleardiff    - Clears diff flag of all displayed windows.
+Buffetdelete       - Delete the selected buffer 
+Buffetdeletef      - Delete the buffer even if contents are not saved
+Buffetload         - Load the selected buffer to current windows
+Buffetloadonly     - Load the selected buffer to current window and make it the only one displayed.
+Buffetgoto         - Go to the selected tab/window/buffer   
+Buffetopentab      - Open the selected buffer in a new tab
+Buffetopenh        - Open the buffer in a horizintal split
+Buffetopenv        - Open the buffer in a vertical split  
+Buffetrefresh      - Refresh the buffer list.
+Buffetdiffsplit    - Open a diff window with difference between current buffer and selected buffer shown.
+Buffettoggledetail - Toggle detailed display of file path
+
 
 New in version 2.10[(Screenshot)](http://i43.tinypic.com/33kadsx.png)
 
