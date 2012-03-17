@@ -98,6 +98,14 @@ function! s:cursormove()
 	elseif(s:lineonclose ==1 )
 		call cursor(len(s:displayed)+1,3)
 	endif
+	if(exists("g:Buffetstatuslineupdatefunction"))
+		let l:llindex= line('.') - 2
+		if(exists("s:displayed[l:llindex]"))
+			let l:target = s:displayed[l:llindex]
+			let l:Statusupdatefunction = function(g:Buffetstatuslineupdatefunction)
+			call l:Statusupdatefunction(l:target)
+		endif
+	endif
 endfunction
 function! s:buffet_pathshorten(str)
 	if(s:detail == 1)
@@ -105,6 +113,9 @@ function! s:buffet_pathshorten(str)
 	else
 		return pathshorten(fnamemodify(a:str,':p'))
 	endif
+endfunction
+function! s:statusupdate(details)
+	echo a:details
 endfunction
 function! s:callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
 			if(getbufvar(a:bufno,'&modified'))
@@ -616,4 +627,4 @@ command! Buffettoggledetail :call <sid>toggle_detail()
 if(!exists("g:Buffetbufferformatfunction"))
 	let g:Buffetbufferformatfunction = "s:callback"
 endif
-
+"let g:Buffetstatuslineupdatefunction = "s:statusupdate"
