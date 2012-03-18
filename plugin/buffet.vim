@@ -65,7 +65,7 @@
 "
 "
 if exists("g:loaded_buffet")
-	finish
+	"finish
 endif
 let g:loaded_buffet = 1
 
@@ -326,7 +326,29 @@ function! s:toggle(gotolastbuffer)
 	let s:bufferlistlite = s:getallbuffers()
 	let s:sourcebuffer = bufnr('%')
 	let s:sourcewindow = winnr()
+	
 	let s:sourcetab = tabpagenr()
+	if(!buflisted(s:sourcebuffer))
+		let s:sourcewindow = -1
+		echo s:bufrecent
+		if(len(s:bufrecent) > 1)
+			let s:sourcebuffer = s:bufrecent[0]
+			let s:sourcewindow = bufwinnr(str2nr(s:sourcebuffer))
+		endif
+		if(s:sourcewindow == -1)
+			let l:tempwinnr = 1
+			while(!buflisted(winbufnr(l:tempwinnr))) 
+				let l:tempwinnr+=1
+				if(winbufnr(l:tempwinnr) == -1)
+					let l:tempwinnr= -1
+					let s:sourcebuffer = -1
+					break
+				endif
+			endwhile
+			let s:sourcebuffer = bufwinnr(l:tempwinnr)
+			let s:sourcewindow = l:tempwinnr
+		endif
+	endif
 	let s:buftotabwindow = {}
 	for l:i in range(tabpagenr('$'))
 	   let l:windowno = 1
