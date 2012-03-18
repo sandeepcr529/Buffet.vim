@@ -508,6 +508,9 @@ function! s:loadbuffer(isonly)
 		call s:close()
 		if(s:sourcewindow == -1)
 			exe "botright vert sbuffer ".l:target
+			if(a:isonly == 1 && winnr('$')>1)
+				exe 'only!'
+			endif
 		else
 			call s:switch_buffer(l:target)
 			if(a:isonly == 1 && winnr('$')>1)
