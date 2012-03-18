@@ -65,7 +65,7 @@
 "
 "
 if exists("g:loaded_buffet")
-	finish
+	"finish
 endif
 let g:loaded_buffet = 1
 
@@ -255,7 +255,9 @@ function! s:close()
 		let s:lineonclose = line('.')
 		:bdelete buflisttempbuffer412393
 		echo ''
-		exe s:sourcewindow. ' wincmd w'
+		if(s:sourcewindow != -1) 
+			exe s:sourcewindow. ' wincmd w'
+		endif
 	endif
 endfunction
 
@@ -504,9 +506,13 @@ function! s:loadbuffer(isonly)
 		exe s:buflistwindow . ' wincmd w'
 		let l:target = s:displayed[l:llindex][0]
 		call s:close()
-		call s:switch_buffer(l:target)
-		if(a:isonly == 1 && winnr('$')>1)
-			exe 'only!'
+		if(s:sourcewindow == -1)
+			exe "botright vert sbuffer ".l:target
+		else
+			call s:switch_buffer(l:target)
+			if(a:isonly == 1 && winnr('$')>1)
+				exe 'only!'
+			endif
 		endif
 	else
 		call s:close()
