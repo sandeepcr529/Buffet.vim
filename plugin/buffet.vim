@@ -65,7 +65,7 @@
 "
 "
 if exists("g:loaded_buffet")
-	"finish
+	finish
 endif
 let g:loaded_buffet = 1
 
