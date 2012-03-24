@@ -449,8 +449,7 @@ function! s:openintab()
 			exe s:buflistwindow . ' wincmd w'
 			let l:target = s:displayed[l:llindex][0]
 			call s:close()
-			exe "tabnew"
-			exe l:target. ' buf!'
+			exe "tab sbuf ".l:target
 	else
 		call s:close()
 	endif
