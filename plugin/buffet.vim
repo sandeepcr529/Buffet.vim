@@ -1,4 +1,5 @@
-" Buffet Plugin for VIM > 7.3 version 2.50
+" Buffet Plugin for VIM > 7.3 
+let s:buffet_version = "2.50"
 "
 " A fast, simple and easy to use pluggin for switching and managing buffers.
 "
@@ -174,7 +175,7 @@ function! s:display_buffer_list(gotolastbuffer)
 			call add(s:bufrecent,l:i)
 		endif
 	endfor
-	call setline(1,"Buffet-2.10 ( Enter Number to search for a buffer number )")
+	call setline(1,"Buffet-".s:buffet_version." ( Enter Number to search for a buffer number )")
 	let s:displayed = []
 	let s:last_buffer_line = 0
 	let l:columns = []
