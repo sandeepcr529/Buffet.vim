@@ -1,6 +1,6 @@
 Buffet is a plugin for the vim editor for listing and switching buffers, windows and tabs.([vim.org](http://www.vim.org/scripts/script.php?script_id=3896))
 
-New in version 2.60
+New in version 2.60[(Screenshot)](http://i45.tinypic.com/f5hdx.jpg)
 
 * Added two new keyboard commands to mark a buffer in the list of displayed Buffers. 
 * Use 'm' to toggle mark on a single buffer, and 'M' to clear all the previously set marks.
