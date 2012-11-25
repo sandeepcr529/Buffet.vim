@@ -1,5 +1,5 @@
-" Buffet Plugin for VIM > 7.3 
-let s:buffet_version = "2.50"
+" Buffet Plugin for VIM > 7.3 version 2.60
+let s:buffet_version = '2.60'
 "
 " A fast, simple and easy to use pluggin for switching and managing buffers.
 "
@@ -22,6 +22,7 @@ let s:buffet_version = "2.50"
 "
 " Enter(Replace current buffer)
 " o - make window fill with selected buffer
+" a - all details
 " hh - (Horizontal Split)
 " v - (Vertical Split)
 " - - (Vertical Diff Split)
@@ -29,6 +30,8 @@ let s:buffet_version = "2.50"
 " d - (Delete selected buffer)
 " x - (Close window)
 " c - (Clear diff flags for all windows)
+" m - (Mark a buffer)
+" M - (Clear all marks)
 "
 " 2.Move up or down using the navigation keys to reach the buffer line.
 "
@@ -61,7 +64,7 @@ let s:buffet_version = "2.50"
 " You can now set youe own maps to the commands given at the end of this file
 " instead.
 "
-" Last Change:	2012 March
+" Last Change:	2012 Nov
 " Maintainer:	Sandeep.c.r<sandeepcr2@gmail.com>
 "
 "
@@ -140,10 +143,14 @@ function! s:callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
 	else 
 		let l:fc = ' '
 	endif
+	let l:bufmark = ''
+	if(index(s:bufmarks,a:bufno)!=-1)
+		let l:bufmark = '>>>  '
+	endif
 	if(a:isparent == 1)
-		return [l:fc,a:bufno,fnamemodify(s:bufferlistlite[a:bufno]."   ",':t'),s:buffet_pathshorten(s:bufferlistlite[a:bufno]),l:modifiedflag,l:tabno,l:windowno]
+		return [l:fc,a:bufno,fnamemodify(s:bufferlistlite[a:bufno]."   ",':t'),l:bufmark,s:buffet_pathshorten(s:bufferlistlite[a:bufno]),l:modifiedflag,l:tabno,l:windowno]
 	else
-		return [l:fc,'','','','',l:tabno,l:windowno]
+		return [l:fc,'','','','','',l:tabno,l:windowno]
 	endif
 endfunction
 function! s:process_callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
@@ -231,7 +238,7 @@ function! s:display_buffer_list(gotolastbuffer)
 	call setline(l:line,"")
 	let l:line+=1
 	if(!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
-		call setline(l:line,"Enter(Load buffer) | hh/v/-/c (Horizontal/Vertical/Vertical Diff Split/Clear Diff) | o(Maximize) | t(New tab) | m(Toggle detail) | g(Go to window) | d(Delete buffer) | x(Close window) ")
+		call setline(l:line,"Enter(Load buffer) | hh/v/-/c (Horizontal/Vertical/Vertical Diff Split/Clear Diff) | o(Maximize) | t(New tab) | a(Toggle detail) | m(Toggle buffer mark) | M(clear all marks) | g(Go to window) | d(Delete buffer) | x(Close window) ")
 	else
 		call setline(l:line,"Default mappings disabled.")
 	endif
@@ -296,7 +303,7 @@ function! s:press(num)
 		let s:keybuf = s:keybuf . a:num
 	endif
 	setlocal modifiable
-	call setline(1 ,'Buffet-2.10 - Searching for buffer:'.s:keybuf.' (Use backspace to edit)')
+	call setline(1 ,'Buffet-'.s:buffet_version.' - Searching for buffer:'.s:keybuf.' (Use backspace to edit)')
 	let l:index =  0
 	for l:i in s:displayed
 		if(l:i[0] == s:keybuf)
@@ -375,6 +382,8 @@ function! s:toggle(gotolastbuffer)
 	nnoremap <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-M> :call <sid>loadbuffer(0)<cr>
 	if(!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
+		nnoremap <buffer> <silent> m :call <sid>togglemark()<cr>
+		nnoremap <buffer> <silent> M :call <sid>clearmarks()<cr>
 		nnoremap <buffer> <silent> x :call <sid>closewindow(0)<cr>
 		nnoremap <buffer> <silent> X :call <sid>closewindow(1)<cr>
 		nnoremap <buffer> <silent> c :call <sid>cleardiff()<cr>
@@ -406,8 +415,8 @@ function! s:toggle(gotolastbuffer)
 	nnoremap <buffer> <silent> 8 :call <sid>press(8)<cr>
 	nnoremap <buffer> <silent> 9 :call <sid>press(9)<cr>
 	nnoremap <buffer> <silent> - :call <sid>diff_split('v')<cr>
-	nnoremap <buffer> <silent> m :call <sid>toggle_detail()<cr>
-	nnoremap <buffer> <silent> M :call <sid>toggle_detail()<cr>
+	nnoremap <buffer> <silent> a :call <sid>toggle_detail()<cr>
+	nnoremap <buffer> <silent> A :call <sid>toggle_detail()<cr>
 	nnoremap <buffer> <silent> <BS> :call <sid>press(-1)<cr>
 	nnoremap <buffer> <silent> <Esc> :call <sid>close()<cr>
 	augroup  Tlistaco1
@@ -606,6 +615,27 @@ function! s:switch_buffer(bufferno)
 	endif
 endfunction
 
+function! s:togglemark()
+	let l:llindex= line('.') - 2
+	if(exists("s:displayed[l:llindex]"))
+		let l:target = s:displayed[l:llindex][0]
+		let l:index = index(s:bufmarks,l:target)
+		if(l:index==-1)
+			call add(s:bufmarks,l:target)
+		else
+			call remove(s:bufmarks,l:index)
+		endif
+		call s:toggle(0)
+		call s:toggle(0)
+	endif
+endfunction
+
+function! s:clearmarks()
+	let s:bufmarks = []
+	call s:toggle(0)
+	call s:toggle(0)
+endfunction
+
 function! s:updaterecent()
 		let l:bufname = bufname("%")
 		let l:j = bufnr('%')
@@ -622,6 +652,7 @@ endfunction
 function! s:setcallback(func)
 	let s:callbackref = function(a:func)
 endfunction
+
 let s:bufrecent = []
 let s:buflinenos = {}
 let s:bufferlistlite =  {}
@@ -631,6 +662,7 @@ let s:lineonclose  = 3
 let s:currentposition  = ''
 let s:firstrun  =  1
 let s:detail  =  0
+let s:bufmarks = []
 augroup Tlistacom
 		autocmd!
 		au  BufEnter * call <sid>updaterecent()
@@ -654,6 +686,8 @@ command! Buffetopenv :call <sid>split('v')
 command! Buffetrefresh :call <sid>refresh()
 command! Buffetdiffsplit :call <sid>diff_split('v')
 command! Buffettoggledetail :call <sid>toggle_detail()
+command! Buffettogglemark :call <sid>togglemark()
+command! Buffetclearmarks :call <sid>clearmarks()
 
 if(!exists("g:Buffetbufferformatfunction"))
 	let g:Buffetbufferformatfunction = "s:callback"
