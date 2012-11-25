@@ -1,14 +1,10 @@
 Buffet is a plugin for the vim editor for listing and switching buffers, windows and tabs.([vim.org](http://www.vim.org/scripts/script.php?script_id=3896))
 
+New in version 2.60
 
-New in version 2.50
-
-With this version you can format the display of buffer list using a callback function. Set the call back using the line in your vimrc
-   
-   let g:Buffetbufferformatfunction = "s:callback"
-
-You can replace s:callback with your callback function name.  The call back function accept following parameters and must return a one dimensional list of columns. If empty list is returned, the entry is not
-displayed.
+* Added two new keyboard commands to mark a buffer in the list of displayed Buffers. 
+* Use 'm' to toggle mark on a single buffer, and 'M' to clear all the previously set marks.
+* The two new commands for this operation are 'Buffettogglemark' and 'Buffetclearmarks'
 
 Parameters:
 
@@ -58,6 +54,18 @@ You can now set your own maps to the commands given below.
  
 * Buffettoggledetail - Toggle detailed display of file path
 
+* Buffettogglemark   - Toggle a mark on a buffer
+
+* Buffetclearmarks   - Clear all marks set on the buffers
+
+New in version 2.50
+
+With this version you can format the display of buffer list using a callback function. Set the call back using the line in your vimrc
+   
+   let g:Buffetbufferformatfunction = "s:callback"
+
+You can replace s:callback with your callback function name.  The call back function accept following parameters and must return a one dimensional list of columns. If empty list is returned, the entry is not
+displayed.
 
 New in version 2.10[(Screenshot)](http://i43.tinypic.com/33kadsx.png)
 
@@ -133,7 +141,16 @@ This command deletes the selected buffer from the buffer list. Buffer list windo
 
 This command closes the selected window. It does not matter if the window is open in another tab. Buffer is not removed from the list. The buffer list window remains open. With this you can use the buffer list window as a remote control to navigate to or close any window in any tab.
 
-### m
+### a
 
 Toggles the detailed view for file paths.
+
+### m
+
+Toggles a mark on the buffer
+
+### M
+
+Clears all marks set on the buffers
+
 
