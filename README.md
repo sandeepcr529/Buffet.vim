@@ -1,14 +1,14 @@
 Buffet is a plugin for the vim editor for listing and switching buffers, windows and tabs.([vim.org](http://www.vim.org/scripts/script.php?script_id=3896))
 
+New in version 2.65.2
+
+You can now use the '>' or the :Buffettogglesort command to switch between mru / alphabetical order
+
 New in version 2.60[(Screenshot)](http://i45.tinypic.com/f5hdx.jpg)
 
 * Added two new keyboard commands to mark a buffer in the list of displayed Buffers. 
 * Use 'm' to toggle mark on a single buffer, and 'M' to clear all the previously set marks.
 * The two new commands for this operation are 'Buffettogglemark' and 'Buffetclearmarks'
-
-New in version 2.65.2
-
-You can now use the '>' or the :Buffettogglesort command to switch between mru / alphabetical order
 
 New in version 2.50
 
