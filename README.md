@@ -6,6 +6,10 @@ New in version 2.60[(Screenshot)](http://i45.tinypic.com/f5hdx.jpg)
 * Use 'm' to toggle mark on a single buffer, and 'M' to clear all the previously set marks.
 * The two new commands for this operation are 'Buffettogglemark' and 'Buffetclearmarks'
 
+New in version 2.65.2
+
+You can now use the '>' or the :Buffettogglesort command to switch between mru / alphabetical order
+
 New in version 2.50
 
 With this version you can format the display of buffer list using a callback function. Set the call back using the line in your vimrc
