@@ -1,5 +1,5 @@
 " Buffet Plugin for VIM > 7.3 version 2.60
-let s:buffet_version = '2.60'
+let s:buffet_version = '2.65.2'
 "
 " A fast, simple and easy to use pluggin for switching and managing buffers.
 "
@@ -30,8 +30,10 @@ let s:buffet_version = '2.60'
 " d - (Delete selected buffer)
 " x - (Close window)
 " c - (Clear diff flags for all windows)
-" m - (Mark a buffer)
+" m - (Increase Mark count on a buffer)
+" n - (Decrease Mark count on a buffer)
 " M - (Clear all marks)
+" > - (Toggle sorting of buffer in alphabetic order of filename/ MRU mode)
 "
 " 2.Move up or down using the navigation keys to reach the buffer line.
 "
@@ -144,8 +146,8 @@ function! s:callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
 		let l:fc = ' '
 	endif
 	let l:bufmark = ''
-	if(index(s:bufmarks,a:bufno)!=-1)
-		let l:bufmark = '>>>  '
+	if(exists('s:bufmarks[a:bufno]'))
+		let l:bufmark = repeat('>',s:bufmarks[a:bufno]).'  '
 	endif
 	if(a:isparent == 1)
 		return [l:fc,a:bufno,fnamemodify(s:bufferlistlite[a:bufno]."   ",':t'),l:bufmark,s:buffet_pathshorten(s:bufferlistlite[a:bufno]),l:modifiedflag,l:tabno,l:windowno]
@@ -170,6 +172,17 @@ function! s:process_callback(bufno,tabno,windowno,srctab,srcwindow,isparent)
 	endfor
 	return [l:return,l:cw]
 endfunction
+function! s:buffer_name_compare(buf1, buf2)
+    let l:name1 = fnamemodify(bufname(str2nr(a:buf1)),":p:t")
+    let l:name2 = fnamemodify(bufname(str2nr(a:buf2)),":p:t")
+    if(l:name1 > l:name2)
+        return 1
+    elseif(l:name1 < l:name2)
+        return -1
+    else 
+        return 0
+    endif
+endfunction
 function! s:display_buffer_list(gotolastbuffer)
 	call s:setcallback(g:Buffetbufferformatfunction)
 	let s:columnwidths = repeat([3],50)
@@ -186,7 +199,11 @@ function! s:display_buffer_list(gotolastbuffer)
 	let s:displayed = []
 	let s:last_buffer_line = 0
 	let l:columns = []
-	for l:i in s:bufrecent
+    let l:bufrecent = copy(s:bufrecent)
+    if(s:sortmode == 'a')
+        call sort(l:bufrecent,"s:buffer_name_compare")
+    endif
+	for l:i in l:bufrecent
 			let l:short_file_name = ''
 			let l:thisbufno = str2nr(l:i)
 			if(exists("s:buftotabwindow[l:thisbufno]"))
@@ -246,7 +263,7 @@ function! s:display_buffer_list(gotolastbuffer)
 	exe 'highlight buffethelpline guibg=black'
 	exe 'highlight buffethelpline guifg=orange'
 	exe '2match buffethelpline /\%1l\|\%'.l:line.'l.\%>1c/'
-	if(a:gotolastbuffer==1)
+	if(a:gotolastbuffer==1 && 0)
 		"call cursor(s:last_buffer_line,3)
 		call cursor(3,3)
 	else
@@ -308,7 +325,7 @@ function! s:press(num)
 	for l:i in s:displayed
 		if(l:i[0] == s:keybuf)
 			let l:index += 2
-			exe "normal "+l:index+ "gg"
+			exe "normal! "+l:index+ "gg"
 			break
 		endif
 		let l:index += 1
@@ -340,7 +357,6 @@ function! s:toggle(gotolastbuffer)
 	let s:sourcetab = tabpagenr()
 	if(!buflisted(s:sourcebuffer))
 		let s:sourcewindow = -1
-		echo s:bufrecent
 		if(len(s:bufrecent) > 1)
 			let s:sourcebuffer = s:bufrecent[0]
 			let s:sourcewindow = bufwinnr(str2nr(s:sourcebuffer))
@@ -382,7 +398,8 @@ function! s:toggle(gotolastbuffer)
 	nnoremap <buffer> <silent> <C-R> :call <sid>loadbuffer(0)<cr>
 	nnoremap <buffer> <silent> <C-M> :call <sid>loadbuffer(0)<cr>
 	if(!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
-		nnoremap <buffer> <silent> m :call <sid>togglemark()<cr>
+		nnoremap <buffer> <silent> m :call <sid>addmark()<cr>
+		nnoremap <buffer> <silent> n :call <sid>decmark()<cr>
 		nnoremap <buffer> <silent> M :call <sid>clearmarks()<cr>
 		nnoremap <buffer> <silent> x :call <sid>closewindow(0)<cr>
 		nnoremap <buffer> <silent> X :call <sid>closewindow(1)<cr>
@@ -403,6 +420,7 @@ function! s:toggle(gotolastbuffer)
 		nnoremap <buffer> <silent> v :call <sid>split('v')<cr>
 		nnoremap <buffer> <silent> V :call <sid>split('v')<cr>
 		nnoremap <buffer> <silent> r :call <sid>refresh()<cr>
+		nnoremap <buffer> <silent> > :call <sid>toggle_sort()<cr>
 	endif
 	nnoremap <buffer> <silent> 0 :call <sid>press(0)<cr>
 	nnoremap <buffer> <silent> 1 :call <sid>press(1)<cr>
@@ -431,6 +449,17 @@ function! s:toggle_detail()
 	call s:display_buffer_list(0)
 	setlocal nomodifiable
 endfunction
+function! s:toggle_sort()
+    if(s:sortmode == 'r') 
+        let s:sortmode = 'a'
+    else
+        let s:sortmode = 'r'
+    endif
+	setlocal modifiable
+	call s:display_buffer_list(0)
+	setlocal nomodifiable
+endfunction
+
 function! s:cleardiff()
 	for i in range(1,winnr('$'))
 		call setwinvar(i,"&diff",0)
@@ -578,7 +607,7 @@ function! s:diff_split_buffer(bufferno,mode)
 		exe 'belowright ' .a:bufferno. ' sbuf'
 	endif
 	if(exists("s:buflinenos[a:bufferno]"))
-		exe "normal "+s:buflinenos[a:bufferno] + "gg"
+		exe "normal! "+s:buflinenos[a:bufferno] + "gg"
 	endif
 	call setwinvar(s:sourcewindow,"&diff",1)
 	call setwinvar(s:sourcewindow,"&scrollbind",1)
@@ -600,7 +629,7 @@ function! s:split_buffer(bufferno,mode)
 		exe 'belowright ' .a:bufferno. ' sbuf'
 	endif
 	if(exists("s:buflinenos[a:bufferno]"))
-		exe "normal "+s:buflinenos[a:bufferno] + "gg"
+		exe "normal! "+s:buflinenos[a:bufferno] + "gg"
 	endif
 	set nodiff
 	set noscrollbind
@@ -611,19 +640,32 @@ function! s:switch_buffer(bufferno)
 	set nodiff
 	set noscrollbind
 	if(exists("s:buflinenos[a:bufferno]"))
-		exe "normal "+s:buflinenos[a:bufferno] + "gg"
+		exe "normal! "+s:buflinenos[a:bufferno] + "gg"
 	endif
 endfunction
 
-function! s:togglemark()
+function! s:addmark()
 	let l:llindex= line('.') - 2
 	if(exists("s:displayed[l:llindex]"))
 		let l:target = s:displayed[l:llindex][0]
-		let l:index = index(s:bufmarks,l:target)
-		if(l:index==-1)
-			call add(s:bufmarks,l:target)
+		if(exists('s:bufmarks[l:target]'))
+			let s:bufmarks[l:target] += 1
 		else
-			call remove(s:bufmarks,l:index)
+			let s:bufmarks[l:target] = 1
+		endif
+		call s:toggle(0)
+		call s:toggle(0)
+	endif
+endfunction
+
+function! s:decmark()
+	let l:llindex= line('.') - 2
+	if(exists("s:displayed[l:llindex]"))
+		let l:target = s:displayed[l:llindex][0]
+		if(exists('s:bufmarks[l:target]'))
+			if(s:bufmarks[l:target]>0)
+				let s:bufmarks[l:target] -= 1
+			endif
 		endif
 		call s:toggle(0)
 		call s:toggle(0)
@@ -631,7 +673,7 @@ function! s:togglemark()
 endfunction
 
 function! s:clearmarks()
-	let s:bufmarks = []
+	let s:bufmarks = {}
 	call s:toggle(0)
 	call s:toggle(0)
 endfunction
@@ -662,7 +704,8 @@ let s:lineonclose  = 3
 let s:currentposition  = ''
 let s:firstrun  =  1
 let s:detail  =  0
-let s:bufmarks = []
+let s:sortmode  =  'r'
+let s:bufmarks = {}
 augroup Tlistacom
 		autocmd!
 		au  BufEnter * call <sid>updaterecent()
@@ -686,8 +729,10 @@ command! Buffetopenv :call <sid>split('v')
 command! Buffetrefresh :call <sid>refresh()
 command! Buffetdiffsplit :call <sid>diff_split('v')
 command! Buffettoggledetail :call <sid>toggle_detail()
-command! Buffettogglemark :call <sid>togglemark()
+command! Buffetincmark :call <sid>addmark()
+command! Buffettdecmark :call <sid>decmark()
 command! Buffetclearmarks :call <sid>clearmarks()
+command! Buffettogglesort :call <sid>toggle_sort()
 
 if(!exists("g:Buffetbufferformatfunction"))
 	let g:Buffetbufferformatfunction = "s:callback"
