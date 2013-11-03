@@ -437,6 +437,7 @@ function! s:toggle(gotolastbuffer)
 	nnoremap <buffer> <silent> A :call <sid>toggle_detail()<cr>
 	nnoremap <buffer> <silent> <BS> :call <sid>press(-1)<cr>
 	nnoremap <buffer> <silent> <Esc> :call <sid>close()<cr>
+	nnoremap <buffer> <silent> q :call <sid>close()<cr>
 	augroup  Tlistaco1
 			autocmd!
 			au  BufLeave <buffer> call <sid>close()
