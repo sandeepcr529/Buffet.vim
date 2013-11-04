@@ -263,7 +263,7 @@ function! s:display_buffer_list(gotolastbuffer)
 	exe 'highlight buffethelpline guibg=black'
 	exe 'highlight buffethelpline guifg=orange'
 	exe '2match buffethelpline /\%1l\|\%'.l:line.'l.\%>1c/'
-	if(a:gotolastbuffer==1 && 0)
+	if(a:gotolastbuffer==1)
 		"call cursor(s:last_buffer_line,3)
 		call cursor(3,3)
 	else
