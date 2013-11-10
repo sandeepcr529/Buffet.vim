@@ -734,6 +734,7 @@ command! Buffetincmark :call <sid>addmark()
 command! Buffettdecmark :call <sid>decmark()
 command! Buffetclearmarks :call <sid>clearmarks()
 command! Buffettogglesort :call <sid>toggle_sort()
+command! Bufferlistclose :call <sid>close()
 
 if(!exists("g:Buffetbufferformatfunction"))
 	let g:Buffetbufferformatfunction = "s:callback"
