@@ -66,6 +66,9 @@ let s:buffet_version = '2.65.2'
 " You can now set youe own maps to the commands given at the end of this file
 " instead.
 "
+" You can disable the help text in the Buffet window by seting this variable:
+"    let g:buffetbareview = 1
+"
 " Last Change:	2012 Nov
 " Maintainer:	Sandeep.c.r<sandeepcr2@gmail.com>
 "
@@ -195,7 +198,9 @@ function! s:display_buffer_list(gotolastbuffer)
 			call add(s:bufrecent,l:i)
 		endif
 	endfor
-	call setline(1,"Buffet-".s:buffet_version." ( Enter Number to search for a buffer number )")
+	if (!exists("g:buffetbareview"))
+		call setline(1,"Buffet-".s:buffet_version." ( Enter Number to search for a buffer number )")
+	endif
 	let s:displayed = []
 	let s:last_buffer_line = 0
 	let l:columns = []
@@ -251,14 +256,17 @@ function! s:display_buffer_list(gotolastbuffer)
 	if(s:last_buffer_line == 0)
 		let s:last_buffer_line = l:line+1
 	endif
-	exe "resize ".(len(s:displayed)+4)
+	let l:size = (exists("g:buffetbareview")) ? 2 : 4
+	exe "resize ".(len(s:displayed) + l:size)
 	call setline(l:line,"")
 	let l:line+=1
-	if(!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
-		call setline(l:line,"Enter(Load buffer) | hh/v/-/c (Horizontal/Vertical/Vertical Diff Split/Clear Diff) | o(Maximize) | t(New tab) | a(Toggle detail) | m(Toggle buffer mark) | M(clear all marks) | g(Go to window) | d(Delete buffer) | x(Close window) ")
-	else
-		call setline(l:line,"Default mappings disabled.")
-	endif
+	if (!exists("g:buffetbareview"))
+		if (!exists("g:buffetdisabledefaultmaps") ||  g:buffetdisabledefaultmaps == 0)
+			call setline(l:line,"Enter(Load buffer) | hh/v/-/c (Horizontal/Vertical/Vertical Diff Split/Clear Diff) | o(Maximize) | t(New tab) | a(Toggle detail) | m(Toggle buffer mark) | M(clear all marks) | g(Go to window) | d(Delete buffer) | x(Close window) ")
+		else
+			call setline(l:line,"Default mappings disabled.")
+		endif
+	end
 	let l:fg = synIDattr(hlID('Statement'),'fg','Question')
 	exe 'highlight buffethelpline guibg=black'
 	exe 'highlight buffethelpline guifg=orange'
