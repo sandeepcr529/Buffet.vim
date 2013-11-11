@@ -437,6 +437,7 @@ function! s:toggle(gotolastbuffer)
 	nnoremap <buffer> <silent> A :call <sid>toggle_detail()<cr>
 	nnoremap <buffer> <silent> <BS> :call <sid>press(-1)<cr>
 	nnoremap <buffer> <silent> <Esc> :call <sid>close()<cr>
+	nnoremap <buffer> <silent> q :call <sid>close()<cr>
 	augroup  Tlistaco1
 			autocmd!
 			au  BufLeave <buffer> call <sid>close()
@@ -733,6 +734,7 @@ command! Buffetincmark :call <sid>addmark()
 command! Buffettdecmark :call <sid>decmark()
 command! Buffetclearmarks :call <sid>clearmarks()
 command! Buffettogglesort :call <sid>toggle_sort()
+command! Bufferlistclose :call <sid>close()
 
 if(!exists("g:Buffetbufferformatfunction"))
 	let g:Buffetbufferformatfunction = "s:callback"
